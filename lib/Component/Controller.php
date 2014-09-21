@@ -18,33 +18,9 @@ namespace Kumbia\Component;
  * @copyright  Copyright (c) 2005-2014 Kumbia Team (http://www.kumbiaphp.com)
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
-class Controller
+abstract class Controller
 {
 
-    /**
-     * Nombre del modulo actual
-     *
-     * @var string
-     */
-    public $module_name;
-    /**
-     * Nombre del controlador actual
-     *
-     * @var string
-     */
-    public $controller_name;
-    /**
-     * Nombre de la acción actual
-     *
-     * @var string
-     */
-    public $action_name;
-    /**
-     * Parámetros de la acción
-     *
-     * @var array
-     */
-    public $parameters;
     /**
      * Limita la cantidad correcta de 
      * parametros de una action
@@ -60,20 +36,25 @@ class Controller
     public $scaffold;
 
     /**
+     * Request object
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * Container of Services
+     * @var Container
+     */
+    protected $service;
+
+    /**
      * Constructor
      *
-     * @param string $module modulo al que pertenece el controlador
-     * @param string $controller nombre del controlador
-     * @param string $action nombre de la accion
-     * @param array $parameters parametros enviados por url
+     * @param Request $request request
      */
-    public function __construct($module, $controller, $action, $parameters)
-    {
-        //TODO: enviar un objeto
-        $this->module_name = $module;
-        $this->controller_name = $controller;
-        $this->parameters = $parameters;
-        $this->action_name = $action;
+    public function __construct(Request $request, $container){
+        $this->request = $request;
+        $this->service = $container;
     }
 
     /**
