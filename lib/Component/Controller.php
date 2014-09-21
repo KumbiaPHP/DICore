@@ -45,7 +45,7 @@ abstract class Controller
      * Container of Services
      * @var Container
      */
-    protected $service;
+    protected $container;
 
     /**
      * Constructor
@@ -53,8 +53,8 @@ abstract class Controller
      * @param Request $request request
      */
     public function __construct(Request $request, $container){
-        $this->request = $request;
-        $this->service = $container;
+        $this->request   = $request;
+        $this->container = $container;
     }
 
     /**
@@ -114,6 +114,16 @@ abstract class Controller
 
         $this->after_filter();
         $this->finalize();
+    }
+
+    public function _view(){
+        $r=$this->request;
+        $view = $this->container['view'];
+        $path = $this->container['appdir'];
+        $view->setPath("$path/{$r->module}/View");
+        /*Set a dirpath of view*/
+        $file = "$r->controller/$r->action";
+        $this->container['view']->select($file);
     }
 
 }
