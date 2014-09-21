@@ -33,9 +33,16 @@ class Template
 
     protected $file = '';
 
+    protected $parent = NULL;
 
-    function __construct(){
+    protected $content = NULL;
 
+    protected $child   = FALSE;
+
+    protected $stack   = array();
+
+    function __construct($child=FALSE){
+        $this->child = $child;
     }
 
     function setPath($path){
@@ -46,13 +53,55 @@ class Template
         $this->file = "{$file}.php";
     }
 
-    function render(Array $var){
+    function render(Array $var, Array $block = array()){
+        $this->block = $block;
         $file = "$this->dir/$this->file";
         if(!is_file($file))
             throw new \RuntimeException("Not Found Template");
+        $this->var = $var;
+        $var['_tpl'] = $this;
         extract($var);
+        ob_start();
         include $file;
+        if(is_object($this->parent)){
+            ob_end_clean();
+            return  $this->parent->render($this->var, $this->block);
+        }
+        $content = ob_get_contents();
+        ob_end_clean();
+        return $content;
+    }
 
+    function childOf($parent){
+        if(!empty($this->parent)){
+            throw new \RuntimeException('Only one parent');
+        }
+        $this->parent = new Template(TRUE);
+        $this->parent->setPath($this->dir);
+        $this->parent->select($parent);
+    }
+
+    function block($tpl){
+        ob_start();
+        $this->stack[]=$tpl;
+    }
+
+
+    function endblock(){
+        /**
+         * @TODO validation
+         */
+        $key = array_pop($this->stack);
+        if($this->child){
+
+            echo (isset($this->block[$key])) ?
+                $this->block[$key]:
+                ob_get_contents();
+            ob_end_flush();
+        }else{
+            $this->block[$key] = ob_get_contents();
+            ob_end_clean();
+        }
     }
 }
 
