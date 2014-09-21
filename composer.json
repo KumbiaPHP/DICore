@@ -1,0 +1,19 @@
+{
+    "name": "kumbiaphp/core",
+    "description": "New Version of KumbiaPHP",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "KumbiaPHP Team",
+            "email": "alberroteran+dev@gmail.com"
+        }
+    ],
+    "require": {
+
+    },
+    "autoload": {
+        "autoload": {
+            "psr-4": { "Kumbia\\": "src/"}
+        }
+    }
+}
