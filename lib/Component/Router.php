@@ -71,8 +71,13 @@ class Router
     {
         $request = $this->request;
         /*Nothing to do for default URL*/
-        if ($request->url == '/')
+        if (empty($request->url)){
+            $request->module     = 'Default';
+            $request->controller = 'Default';
+            $request->action     = 'index';
             return;
+        }
+           
         /*Explode URL*/
         $urls = explode('/', $request->url);
         /*Is it first a module?*/
@@ -82,7 +87,7 @@ class Router
             $request->module = 'Default';
         }
         /*have it more element*/
-        if (empty($url_items)) {
+        if (empty($urls)) {
             $request->controller = 'Default';
             $request->action     = 'index';
             return;
@@ -93,7 +98,7 @@ class Router
         if (empty($urls)){
             $request->action = 'index';
             return;
-        
+        }
         /*action*/
         $request->action = array_shift($urls);
         $request->parameters = $urls;
@@ -103,9 +108,11 @@ class Router
      * to dispatch
      * @return Controller
      */
-    protected function dispatch()
+    function dispatch()
     {
-        $controller = "{$this->module}/{$this->controller}Controller";
+        $request = $this->request;
+        d($request);
+        $controller = "{$request->module}/Controller/{$request->controller}Controller";
         $cont = new $controller($request, $this->container);
         /*execute filter initialize y before*/
         if ($cont->k_callback(true) === false) {
