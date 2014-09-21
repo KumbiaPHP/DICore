@@ -1,6 +1,8 @@
 <?php
 namespace Kumbia;
 use Pimple\Container;
+use Kumbia\Component\Router;
+use Kumbia\Component\Template;
 /**
  * KumbiaPHP Framework
  *
@@ -32,23 +34,27 @@ class App{
      */
     protected $container;
 
-    function __construct($path='src'){
-        $this->path      = __DIR__.$path;
+    function __construct($path){
+        $this->path      =  $path;
         $this->container = new Container();
+        $this->register();
     }
 
     protected function register(){
-        $c = $this->container;
-       
-        $c['path']   = $this->path;
-        $c['router'] = function($k){
-            $url = isset($_SERVER['PATH_INFO'])$_SERVER['PATH_INFO']:'';
-            return new Router($url, $k['path']);
-        }
-
+        $this->container['appdir']   = $this->path;
+        $this->container['router'] = function($c){
+            $url = isset($_SERVER['PATH_INFO'])?$_SERVER['PATH_INFO']:'';
+            return new Router($url, $c);
+        };
+        $this->container['view']  = function($e){
+            return new Template($e);
+        };
     }
 
     function execute(){
-        $this->container['router']->dispatch();
+        $controller = $this->container['router']->dispatch();
+        $vars       = get_object_vars($controller);
+        $controller->_view();
+        $this->container['view']->render($vars);
     }
 }
