@@ -47,7 +47,7 @@ class App{
             return new Router($url, $c);
         };
         $this->container['view']  = function($e){
-            return new Template($e);
+            return new Template();
         };
     }
 
@@ -55,6 +55,6 @@ class App{
         $controller = $this->container['router']->dispatch();
         $vars       = get_object_vars($controller);
         $controller->_view();
-        $this->container['view']->render($vars);
+        echo $this->container['view']->render($vars);
     }
 }
