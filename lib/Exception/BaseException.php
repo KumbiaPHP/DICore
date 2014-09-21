@@ -1,5 +1,5 @@
 <?php
-namespace \Kumbia\Exception;
+namespace Kumbia\Exception;
 /**
  * KumbiaPHP web & app Framework
  *
@@ -25,7 +25,7 @@ namespace \Kumbia\Exception;
  * @category   Kumbia
  * @package    Core
  */
-abstract class BaseException extends Exception
+abstract class BaseException extends \Exception
 {
 
     /**

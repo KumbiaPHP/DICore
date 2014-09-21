@@ -18,7 +18,8 @@ namespace Kumbia\Component;
  * @copyright  Copyright (c) 2005-2014 Kumbia Team (http://www.kumbiaphp.com)
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
-use \Kumbia\Expection\SecurityException;
+use \Kumbia\Exception\SecurityException;
+use \Kumbia\Exception\NotFoundException;
 /**
  * Clase que Actua como router del Front-Controller
  *
@@ -43,6 +44,12 @@ class Router
      */
     protected $path;
 
+    /**
+     * Container
+     * @var Container
+     */
+    protected $container;
+
 
     /**
 	 * Create a Router
@@ -52,7 +59,8 @@ class Router
 	 */
 	public  function __construct($url, $container)
 	{
-		$this->path = $container['path'];
+        $this->path = $container['appdir'];
+        $this->container = $container;
 		/*Check URL for security*/
         if (stripos($url, '/../') !== false)
 			throw new SecurityException("URL malicious '$url'");
@@ -72,7 +80,7 @@ class Router
         $request = $this->request;
         /*Nothing to do for default URL*/
         if (empty($request->url)){
-            $request->module     = 'Default';
+            $request->module     = 'DefaultModule';
             $request->controller = 'Default';
             $request->action     = 'index';
             return;
@@ -84,7 +92,7 @@ class Router
         if (is_dir("{$this->path}/{$urls[0]}")) {
             $request->module = array_shift($urls);
         }else{
-            $request->module = 'Default';
+            $request->module = 'DefaultModule';
         }
         /*have it more element*/
         if (empty($urls)) {
@@ -111,8 +119,7 @@ class Router
     function dispatch()
     {
         $request = $this->request;
-        d($request);
-        $controller = "{$request->module}/Controller/{$request->controller}Controller";
+        $controller = "\\{$request->module}\\Controller\\{$request->controller}Controller";
         $cont = new $controller($request, $this->container);
         /*execute filter initialize y before*/
         if ($cont->k_callback(true) === false) {
@@ -120,9 +127,9 @@ class Router
         }
         /*Get method*/
 		try {
-			$reflectionMethod = new \ReflectionMethod($cont, $this->action);
+			$reflectionMethod = new \ReflectionMethod($cont, $request->action);
 		} catch (\ReflectionException $e) {
-			throw new Exception(null, 'no_action');
+			throw new NotFoundException(null, 'no_action');
 		}
         /*No execute protected method*/
         if ($reflectionMethod->isProtected() || $reflectionMethod->isConstructor()) {

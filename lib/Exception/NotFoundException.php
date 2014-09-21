@@ -20,12 +20,12 @@ namespace Kumbia\Exception;
  */
 
 /**
- * Base class for Exception
+ * 404 Not Found Exception
  *
  * @category   Kumbia
  * @package    Core
  */
-class SecurityException extends BaseException
+class NotFoundException extends BaseException
 {
 
 }
