@@ -13,8 +13,6 @@
         "pimple/pimple": "~3.0"
     },
     "autoload": {
-        "autoload": {
-            "psr-4": { "Kumbia\\": "lib/"}
-        }
+        "psr-4": { "Kumbia\\": "lib/"}
     }
 }
