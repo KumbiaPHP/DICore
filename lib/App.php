@@ -1,5 +1,6 @@
 <?php
 namespace Kumbia;
+use Pimple\Container;
 /**
  * KumbiaPHP Framework
  *
@@ -20,4 +21,34 @@ namespace Kumbia;
  */
 class App{
 
+    /**
+     * Path of App
+     * @var String
+     */
+    protected $path;
+    /**
+     * Service container
+     * @var Container;
+     */
+    protected $container;
+
+    function __construct($path='src'){
+        $this->path      = __DIR__.$path;
+        $this->container = new Container();
+    }
+
+    protected function register(){
+        $c = $this->container;
+       
+        $c['path']   = $this->path;
+        $c['router'] = function($k){
+            $url = isset($_SERVER['PATH_INFO'])$_SERVER['PATH_INFO']:'';
+            return new Router($url, $k['path']);
+        }
+
+    }
+
+    function execute(){
+        $this->container['router']->dispatch();
+    }
 }
