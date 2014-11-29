@@ -27,6 +27,14 @@ namespace Kumbia\Component;
  */
 class Template
 {
+    
+    /**
+     * Contaienr
+     * @var $container
+     */
+    protected $container = NULL;
+
+
     protected $block = array();
 
     protected $dir = '';
@@ -41,7 +49,8 @@ class Template
 
     protected $stack   = array();
 
-    function __construct($child=FALSE){
+    function __construct($container, $child=FALSE){
+        $this->container = $container;
         $this->child = $child;
     }
 
@@ -59,7 +68,9 @@ class Template
         if(!is_file($file))
             throw new \RuntimeException("Not Found Template");
         $this->var = $var;
-        $var['_tpl'] = $this;
+        /*set global var*/
+        $var['_tpl']    = $this;
+
         extract($var);
         ob_start();
         include $file;
@@ -76,7 +87,7 @@ class Template
         if(!empty($this->parent)){
             throw new \RuntimeException('Only one parent');
         }
-        $this->parent = new Template(TRUE);
+        $this->parent = new Template($this->container, TRUE);
         $this->parent->setPath($this->dir);
         $this->parent->select($parent);
     }
@@ -102,6 +113,14 @@ class Template
             $this->block[$key] = ob_get_contents();
             ob_end_clean();
         }
+    }
+
+    /**
+     * get the public path
+     * @return String
+     */
+    function pp(){
+        return $this->container['publicdir'];
     }
 }
 

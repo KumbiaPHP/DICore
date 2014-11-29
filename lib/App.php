@@ -22,35 +22,43 @@ use Kumbia\Component\Template;
  * @license    http://wiki.kumbiaphp.com/Licencia     New BSD License
  */
 class App{
-
-    /**
-     * Path of App
-     * @var String
-     */
-    protected $path;
     /**
      * Service container
      * @var Container;
      */
     protected $container;
 
-    function __construct($path){
+    function __construct($path, $public){
         $this->path      =  $path;
         $this->container = new Container();
+        $this->public_path = $public;
+        $this->container['appdir'] = $this->path;
+        $this->container['publicdir'] = $this->public_path;
         $this->register();
     }
 
     protected function register(){
-        $this->container['appdir']   = $this->path;
         $this->container['router'] = function($c){
             $url = isset($_SERVER['PATH_INFO'])?$_SERVER['PATH_INFO']:'';
             return new Router($url, $c);
         };
-        $this->container['view']  = function($e){
-            return new Template();
+        $this->container['view']  = function($c){
+            return new Template($c);
         };
     }
 
+    /**
+     * Get the container app
+     * @return Container container app
+     */
+    function getContainer(){
+        return $this->container;
+    }
+
+    /**
+     * Execute the app
+     * @return type
+     */
     function execute(){
         $controller = $this->container['router']->dispatch();
         $vars       = get_object_vars($controller);
